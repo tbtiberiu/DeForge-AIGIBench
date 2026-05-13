@@ -24,10 +24,11 @@ class AIGIBenchDataset(Dataset):
         return image, torch.tensor(label, dtype=torch.float32)
 
 
-class DownUpResize(nn.Module):
-    def __init__(self, scale_range=(0.55, 0.9)):
+class RandomDownUpResize(nn.Module):
+    def __init__(self, scale_range=(0.55, 0.9), p=0.4):
         super().__init__()
         self.scale_range = scale_range
+        self.p = p
         self.interpolations = [
             InterpolationMode.BILINEAR,
             InterpolationMode.BICUBIC,
@@ -35,6 +36,9 @@ class DownUpResize(nn.Module):
         ]
 
     def forward(self, image):
+        if torch.rand(1).item() >= self.p:
+            return image
+
         height, width = tvf.get_size(image)
         scale = torch.empty(1).uniform_(*self.scale_range).item()
         down_height = max(32, int(round(height * scale)))
@@ -61,12 +65,16 @@ class DownUpResize(nn.Module):
         )
 
 
-class GaussianNoise(nn.Module):
-    def __init__(self, sigma_range=(0.002, 0.02)):
+class RandomGaussianNoise(nn.Module):
+    def __init__(self, sigma_range=(0.002, 0.02), p=0.25):
         super().__init__()
         self.sigma_range = sigma_range
+        self.p = p
 
     def forward(self, image):
+        if torch.rand(1).item() >= self.p:
+            return image
+
         sigma = torch.empty(1).uniform_(*self.sigma_range).item()
         noise = torch.randn_like(image) * sigma
         return (image + noise).clamp(0.0, 1.0)
@@ -80,7 +88,7 @@ def get_train_transforms(size=256):
             v2.Resize(resize_size, antialias=False),
             v2.RandomCrop(size),
             v2.RandomHorizontalFlip(),
-            v2.RandomApply([DownUpResize()], p=0.1),
+            RandomDownUpResize(p=0.1),
             v2.RandomApply(
                 [
                     v2.ColorJitter(
@@ -93,7 +101,7 @@ def get_train_transforms(size=256):
             v2.RandomAdjustSharpness(sharpness_factor=1.5, p=0.15),
             v2.RandomApply([v2.JPEG(quality=(40, 95))], p=0.5),
             v2.ToDtype(torch.float32, scale=True),
-            v2.RandomApply([GaussianNoise()], p=0.25),
+            RandomGaussianNoise(p=0.25),
             v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )
