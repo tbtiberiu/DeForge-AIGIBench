@@ -7,12 +7,14 @@ import urllib.request
 
 import numpy as np
 import torch
+import torch.nn as nn
 from datasets import load_dataset
 from dotenv import load_dotenv
 from sklearn import metrics
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from tqdm import tqdm
+from transformers import CLIPModel
 
 CACHE_DIR = None
 
@@ -291,6 +293,73 @@ class AIDE_Detector(DetectorWrapper):
         out = self.model(batch_data)
         # AIDE has 2 classes
         return out.softmax(dim=1)[:, 1].flatten()
+
+
+class C2P_CLIP_Original(nn.Module):
+    def __init__(self, name='openai/clip-vit-large-patch14', num_classes=1):
+        super(C2P_CLIP_Original, self).__init__()
+        self.model = CLIPModel.from_pretrained(name)
+        del self.model.text_model
+        del self.model.text_projection
+        del self.model.logit_scale
+
+        self.model.vision_model.requires_grad_(False)
+        self.model.visual_projection.requires_grad_(False)
+        self.model.fc = nn.Linear(768, num_classes)
+        torch.nn.init.normal_(self.model.fc.weight.data, 0.0, 0.02)
+
+    def encode_image(self, img):
+        vision_outputs = self.model.vision_model(
+            pixel_values=img,
+            output_attentions=self.model.config.output_attentions,
+            output_hidden_states=self.model.config.output_hidden_states,
+            return_dict=self.model.config.return_dict,
+        )
+        pooled_output = vision_outputs[1]  # pooled_output
+        image_features = self.model.visual_projection(pooled_output)
+        return image_features
+
+    def forward(self, img):
+        image_embeds = self.encode_image(img)
+        image_embeds = image_embeds / image_embeds.norm(p=2, dim=-1, keepdim=True)
+        return self.model.fc(image_embeds)
+
+
+class C2P_CLIP_Original_Detector(DetectorWrapper):
+    def __init__(self, model_path=None):
+        super().__init__()
+        # Default to the official release URL if no path provided
+        if model_path is None:
+            model_path = 'https://www.now61.com/f/95OefW/C2P_CLIP_release_20240901.zip'
+
+        if model_path.startswith('http'):
+            state_dict = torch.hub.load_state_dict_from_url(
+                model_path, map_location='cpu', progress=True
+            )
+        else:
+            state_dict = torch.load(model_path, map_location='cpu', weights_only=False)
+
+        self.model = C2P_CLIP_Original(
+            name='openai/clip-vit-large-patch14', num_classes=1
+        )
+        self.model.load_state_dict(state_dict, strict=True)
+        self.model.to(DEVICE).eval()
+
+        self.transform = transforms.Compose(
+            [
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    mean=(0.48145466, 0.4578275, 0.40821073),
+                    std=(0.26862954, 0.26130258, 0.27577711),
+                ),
+            ]
+        )
+
+    def detect(self, img):
+        with torch.no_grad():
+            output = self.model(img)
+            return torch.sigmoid(output).flatten()
 
 
 class C2P_CLIP_Detector(DetectorWrapper):
@@ -788,6 +857,7 @@ def main():
         choices=[
             'AIDE',
             'C2P-CLIP',
+            'C2P-CLIP-Original',
             'C2P-DINOv2',
             'CLIPDetection',
             'CNNDetection',
@@ -861,6 +931,7 @@ def main():
     weight_mapping = {
         'AIDE': './AIGIBench_models/AIDE-main/model_epoch_best.pth',
         'C2P-CLIP': './AIGIBench_models/C2P-CLIP-DeepfakeDetection-main/model_epoch_best.pth',
+        'C2P-CLIP-Original': None,
         'C2P-DINOv2': './AIGIBench_models/C2P-DINOv2-main/model_epoch_best.pth',
         'CLIPDetection': './AIGIBench_models/CLIPDetection-main/model_epoch_best.pth',
         'CNNDetection': './AIGIBench_models/CNNDetection-master/model_epoch_best.pth',
@@ -880,6 +951,7 @@ def main():
     detector_classes = {
         'AIDE': AIDE_Detector,
         'C2P-CLIP': C2P_CLIP_Detector,
+        'C2P-CLIP-Original': C2P_CLIP_Original_Detector,
         'C2P-DINOv2': C2P_DINOv2_Detector,
         'CLIPDetection': CLIPDetection_Detector,
         'CNNDetection': CNNDetection_Detector,
