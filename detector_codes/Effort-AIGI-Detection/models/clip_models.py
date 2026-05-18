@@ -8,17 +8,17 @@ import loralib as lora
 
 
 class ClipModel(nn.Module):
-    def __init__(self, name, opt, num_classes=1):
+    def __init__(self, name, opt, num_classes=1, hf_token=None):
         super(ClipModel, self).__init__()
         self.use_svd = opt.use_svd
         
         if self.use_svd:
-            self.model = CLIPModel.from_pretrained(name)
+            self.model = CLIPModel.from_pretrained(name, token=hf_token)
             self.model.vision_model = apply_svd_residual_to_self_attn(self.model.vision_model, r=1024-1)
             
             self.fc = nn.Linear( 1024, num_classes )
         else:
-            self.model = CLIPModel.from_pretrained(name)
+            self.model = CLIPModel.from_pretrained(name, token=hf_token)
             
             self.fc = nn.Linear( 1024, num_classes )
 

@@ -127,9 +127,14 @@ class AIDE_Detector(DetectorWrapper):
 
 
 class C2P_CLIP_Original(nn.Module):
-    def __init__(self, name='openai/clip-vit-large-patch14', num_classes=1):
+    def __init__(
+        self,
+        name='openai/clip-vit-large-patch14',
+        num_classes=1,
+        hf_token=None,
+    ):
         super(C2P_CLIP_Original, self).__init__()
-        self.model = CLIPModel.from_pretrained(name)
+        self.model = CLIPModel.from_pretrained(name, token=hf_token)
         del self.model.text_model
         del self.model.text_projection
         del self.model.logit_scale
@@ -167,7 +172,9 @@ class C2P_CLIP_Original_Detector(DetectorWrapper):
         else:
             state_dict = torch.load(model_path, map_location='cpu', weights_only=False)
         self.model = C2P_CLIP_Original(
-            name='openai/clip-vit-large-patch14', num_classes=1
+            name='openai/clip-vit-large-patch14',
+            num_classes=1,
+            hf_token=os.getenv('HF_TOKEN'),
         )
         self.model.load_state_dict(state_dict, strict=True)
         self.model.to(DEVICE).eval()
@@ -189,7 +196,11 @@ class C2P_CLIP_Detector(DetectorWrapper):
         self._setup_path('detector_codes/C2P-CLIP-DeepfakeDetection-main')
         from networks.c2p_clip import C2P_CLIP_Model
 
-        self.model = C2P_CLIP_Model(name='openai/clip-vit-large-patch14', num_classes=1)
+        self.model = C2P_CLIP_Model(
+            name='openai/clip-vit-large-patch14',
+            num_classes=1,
+            hf_token=os.getenv('HF_TOKEN'),
+        )
         state_dict = torch.load(model_path, map_location='cpu', weights_only=False)
         if 'model' in state_dict:
             state_dict = state_dict['model']
@@ -222,7 +233,7 @@ class C2P_DINOv2_Detector(DetectorWrapper):
         self._setup_path('detector_codes/C2P-DINOv2-main')
         from model import C2P_DINOv2_Model
 
-        self.model = C2P_DINOv2_Model()
+        self.model = C2P_DINOv2_Model(hf_token=os.getenv('HF_TOKEN'))
         if model_path is not None:
             state_dict = torch.load(model_path, map_location='cpu', weights_only=False)
             self.model.load_state_dict(
@@ -313,6 +324,7 @@ class DeForge_AI_Detector(DetectorWrapper):
             'unfreeze_last_blocks': checkpoint_args.get('unfreeze_last_blocks', 0),
             'image_size': checkpoint_args.get('image_size', 256),
             'forensic_dim': checkpoint_args.get('forensic_dim', 256),
+            'hf_token': os.getenv('HF_TOKEN'),
         }
         lora_target_modules = checkpoint_args.get('lora_target_modules')
         if isinstance(lora_target_modules, str):
@@ -377,7 +389,10 @@ class Effort_Detector(DetectorWrapper):
 
         opt = argparse.Namespace(use_svd=True)
         self.model = ClipModel(
-            name='openai/clip-vit-large-patch14', opt=opt, num_classes=1
+            name='openai/clip-vit-large-patch14',
+            opt=opt,
+            num_classes=1,
+            hf_token=os.getenv('HF_TOKEN'),
         )
         self.model.load_state_dict(
             torch.load(model_path, map_location='cpu', weights_only=False)

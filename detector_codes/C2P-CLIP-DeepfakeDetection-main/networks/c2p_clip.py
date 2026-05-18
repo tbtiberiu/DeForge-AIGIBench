@@ -12,10 +12,11 @@ class C2P_CLIP_Model(nn.Module):
         lora_r=16,
         lora_alpha=32,
         lora_dropout=0.05,
+        hf_token=None,
     ):
         super(C2P_CLIP_Model, self).__init__()
 
-        self.model = CLIPModel.from_pretrained(name)
+        self.model = CLIPModel.from_pretrained(name, token=hf_token)
         del self.model.text_model
         del self.model.text_projection
         del self.model.logit_scale

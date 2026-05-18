@@ -11,11 +11,12 @@ class C2P_DINOv2_Model(nn.Module):
         lora_r=16,
         lora_alpha=32,
         lora_dropout=0.05,
+        hf_token=None,
     ):
         super(C2P_DINOv2_Model, self).__init__()
 
         # Load the DINOv2 model
-        self.backbone = Dinov2Model.from_pretrained(model_name)
+        self.backbone = Dinov2Model.from_pretrained(model_name, token=hf_token)
         self.backbone.requires_grad_(False)  # Freeze by default
 
         # Configure LoRA
