@@ -1,3 +1,15 @@
+---
+title: DeForge AI
+emoji: 📉
+colorFrom: yellow
+colorTo: gray
+sdk: gradio
+sdk_version: 6.14.0
+python_version: '3.13'
+app_file: app.py
+pinned: false
+---
+
 <div align="center">
  <br>
 <h1>Is Artificial Intelligence Generated Image Detection a Solved Problem?</h1>
@@ -31,6 +43,9 @@
 ##
 
 **This repository is the official repository of the AIGIBench.**
+
+> [!NOTE]
+> This is a **modified version** of the original [AIGIBench](https://github.com/HorizonTEL/AIGIBench) repository. In addition to the original dataset and methods, it includes my custom detection solutions: **DeForge-AI** and **C2P-DINOv2** (intermediary solution).
 
 **This repository contains the AIGIBench dataset and the evaluated methods.**
 
