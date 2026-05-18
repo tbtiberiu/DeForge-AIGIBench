@@ -5,7 +5,7 @@ colorFrom: yellow
 colorTo: gray
 sdk: gradio
 sdk_version: 6.14.0
-python_version: '3.12'
+python_version: '3.13'
 app_file: app.py
 pinned: false
 ---
@@ -13,7 +13,7 @@ pinned: false
 <div align="center">
  <br>
 <h1>Is Artificial Intelligence Generated Image Detection a Solved Problem?</h1>
- 
+
 [Ziqiang Li](https://scholar.google.com/citations?user=mj5a8WgAAAAJ&hl=zh-CN)<sup>1</sup>, [Jiazhen Yan](https://scholar.google.com/citations?user=QkURh8EAAAAJ&hl=zh-CN)<sup>1</sup>, [Ziwen He](https://scholar.google.com/citations?user=PjkDK9cAAAAJ&hl=zh-CN)<sup>1</sup>, [Kai Zeng](https://scholar.google.com.hk/citations?user=TsI93SIAAAAJ&hl=zh-CN)<sup>2</sup>, [Weiwei Jiang](https://scholar.google.co.jp/citations?user=mbPN0hgAAAAJ&hl=zh-CN)<sup>1</sup>, [Lizhi Xiong](https://scholar.google.com/citations?user=-FzrEP4AAAAJ&hl=zh-CN)<sup>1</sup>, [Zhangjie Fu](https://scholar.google.com/citations?user=fO9NmagAAAAJ&hl=zh-CN)<sup>1‡</sup>
 
 
@@ -56,7 +56,7 @@ pinned: false
 
 ![example](https://github.com/user-attachments/assets/36250270-6fc1-4919-8078-1865f80913c0)
 
-If this project helps you, please fork, watch, and give a star to this repository.  
+If this project helps you, please fork, watch, and give a star to this repository.
 
 ## 📚Dataset
 The training set and testing set used in the paper can be downloaded on [Huggingface](https://huggingface.co/datasets/HorizonTEL/AIGIBench)/[Baidu Netdisk](https://pan.baidu.com/s/1XTwfXlfqkGxAwYLxXuZbfA?pwd=sm6v).
@@ -174,7 +174,7 @@ _If your retrained results differ significantly from those shown, please contact
 | Method       |    Paper                                                                                                      |    Ref    | R.Acc. | F.Acc. | Acc. | A.P. |
 |:------:      |:---------:                                                                                                    |:---------:|:------:|:------:|:----:|:----:|
 | DDA          | Dual Data Alignment Makes AI-Generated Image Detector Easier Generalizable                                    | NIPS 2025 |  93.9  |  69.3  | 81.6 | 90.2 |
- 
+
 ## Citation
 ```
 @inproceedings{li2025artificial,
