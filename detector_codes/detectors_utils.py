@@ -15,6 +15,7 @@ DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def download_weights():
     weights_path = './AIGIBench_models'
+    token = os.getenv('HF_TOKEN')
     # Check if directory exists and has more than just the .git folder or similar
     if not os.path.exists(weights_path) or len(os.listdir(weights_path)) <= 1:
         print('Downloading weights from Hugging Face Hub...')
@@ -22,6 +23,7 @@ def download_weights():
             repo_id='TheKernel01/AIGIBench_models',
             local_dir=weights_path,
             repo_type='model',
+            token=token,
         )
     return weights_path
 
