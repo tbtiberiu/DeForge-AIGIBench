@@ -54,24 +54,29 @@ class DetectorWrapper:
     def _setup_path(self, path):
         """Append path to sys.path and clear related cached modules to avoid collisions."""
         # Convert relative path to absolute to ensure consistency
-        # Assuming we are in detector_codes/ or the root
         if not os.path.isabs(path):
-            # Try to find the path relative to the root if not found
             if not os.path.exists(path):
-                # If we are in detector_codes, go up one level
                 possible_path = os.path.join('..', path)
                 if os.path.exists(possible_path):
                     path = possible_path
-                else:
-                    # Fallback to absolute if possible or just use as is
-                    pass
 
         abs_path = os.path.abspath(path)
-        if abs_path not in sys.path:
-            sys.path.insert(0, abs_path)
+        # Always move to the front to ensure precedence
+        if abs_path in sys.path:
+            sys.path.remove(abs_path)
+        sys.path.insert(0, abs_path)
 
         # Clear modules that might conflict
-        conflicting = ('networks', 'models', 'utils', 'data', 'model', 'util')
+        conflicting = (
+            'networks',
+            'models',
+            'utils',
+            'data',
+            'model',
+            'util',
+            'dataset',
+            'train',
+        )
         to_delete = [
             m
             for m in list(sys.modules.keys())
@@ -79,6 +84,10 @@ class DetectorWrapper:
         ]
         for m in to_delete:
             del sys.modules[m]
+
+        import importlib
+
+        importlib.invalidate_caches()
 
 
 class AIDE_Detector(DetectorWrapper):
