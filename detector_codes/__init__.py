@@ -14,13 +14,13 @@ DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def download_weights():
-    weights_path = './AIGIBench_models'
+    weights_path = './DeForge-AIGIBench-Models'
     token = os.getenv('HF_TOKEN')
     # Check if directory exists and has more than just the .git folder or similar
     if not os.path.exists(weights_path) or len(os.listdir(weights_path)) <= 1:
         print('Downloading weights from Hugging Face Hub...')
         snapshot_download(
-            repo_id='TheKernel01/AIGIBench_models',
+            repo_id='TheKernel01/DeForge-AIGIBench-Models',
             local_dir=weights_path,
             repo_type='model',
             token=token,
@@ -462,7 +462,7 @@ class LGrad_Detector(DetectorWrapper):
             label_size=0,
             image_channels=3,
         )
-        disc_path = 'AIGIBench_models/LGrad-master/karras2019stylegan-bedrooms-256x256_discriminator.pth'
+        disc_path = 'DeForge-AIGIBench-Models/LGrad-master/karras2019stylegan-bedrooms-256x256_discriminator.pth'
         if not os.path.exists(disc_path):
             os.makedirs(os.path.dirname(disc_path), exist_ok=True)
             urllib.request.urlretrieve(
@@ -633,23 +633,23 @@ class SAFE_Detector(DetectorWrapper):
 
 
 weight_mapping = {
-    'AIDE': './AIGIBench_models/AIDE-main/model_epoch_best.pth',
-    'C2P-CLIP': './AIGIBench_models/C2P-CLIP-DeepfakeDetection-main/model_epoch_best.pth',
+    'AIDE': './DeForge-AIGIBench-Models/AIDE-main/model_epoch_best.pth',
+    'C2P-CLIP': './DeForge-AIGIBench-Models/C2P-CLIP-DeepfakeDetection-main/model_epoch_best.pth',
     'C2P-CLIP-Original': None,
-    'C2P-DINOv2': './AIGIBench_models/C2P-DINOv2-main/model_epoch_best.pth',
-    'CLIPDetection': './AIGIBench_models/CLIPDetection-main/model_epoch_best.pth',
-    'CNNDetection': './AIGIBench_models/CNNDetection-master/model_epoch_best.pth',
-    'DeForge-AI': './AIGIBench_models/DeForge-AI-main/model_epoch_best.pth',
-    'DFFreq': './AIGIBench_models/DFFreq-main/model_epoch_best.pth',
-    'Effort': './AIGIBench_models/Effort-AIGI-Detection/model_epoch_best.pth',
-    'FreqNet': './AIGIBench_models/FreqNet-DeepfakeDetection-main/model_epoch_best.pth',
-    'GramNet': './AIGIBench_models/Gram-Net-main/model_epoch_best.pth',
-    'LaDeDa': './AIGIBench_models/RealTime-DeepfakeDetection-in-the-RealWorld-main/model_epoch_best.pth',
-    'LGrad': './AIGIBench_models/LGrad-master/model_epoch_best.pth',
-    'NPR': './AIGIBench_models/NPR-DeepfakeDetection-main/model_epoch_best.pth',
+    'C2P-DINOv2': './DeForge-AIGIBench-Models/C2P-DINOv2-main/model_epoch_best.pth',
+    'CLIPDetection': './DeForge-AIGIBench-Models/CLIPDetection-main/model_epoch_best.pth',
+    'CNNDetection': './DeForge-AIGIBench-Models/CNNDetection-master/model_epoch_best.pth',
+    'DeForge-AI': './DeForge-AIGIBench-Models/DeForge-AI-main/model_epoch_best.pth',
+    'DFFreq': './DeForge-AIGIBench-Models/DFFreq-main/model_epoch_best.pth',
+    'Effort': './DeForge-AIGIBench-Models/Effort-AIGI-Detection/model_epoch_best.pth',
+    'FreqNet': './DeForge-AIGIBench-Models/FreqNet-DeepfakeDetection-main/model_epoch_best.pth',
+    'GramNet': './DeForge-AIGIBench-Models/Gram-Net-main/model_epoch_best.pth',
+    'LaDeDa': './DeForge-AIGIBench-Models/RealTime-DeepfakeDetection-in-the-RealWorld-main/model_epoch_best.pth',
+    'LGrad': './DeForge-AIGIBench-Models/LGrad-master/model_epoch_best.pth',
+    'NPR': './DeForge-AIGIBench-Models/NPR-DeepfakeDetection-main/model_epoch_best.pth',
     'RIGID': None,
-    'Resnet50': './AIGIBench_models/Resnet50-main/model_epoch_best.pth',
-    'SAFE': './AIGIBench_models/SAFE-main/model_epoch_best.pth',
+    'Resnet50': './DeForge-AIGIBench-Models/Resnet50-main/model_epoch_best.pth',
+    'SAFE': './DeForge-AIGIBench-Models/SAFE-main/model_epoch_best.pth',
 }
 
 detector_classes = {

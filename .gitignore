@@ -2,7 +2,7 @@
 
 .venv/
 
-AIGIBench_models/
+DeForge-AIGIBench-Models/
 
 __pycache__/
 

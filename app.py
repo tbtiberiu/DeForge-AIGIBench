@@ -1,5 +1,5 @@
 import gradio as gr
-from detectors_utils import DEVICE, detector_classes, weight_mapping
+from detector_codes import DEVICE, detector_classes, weight_mapping
 
 # Model cache to avoid reloading
 model_cache = {'name': None, 'instance': None}

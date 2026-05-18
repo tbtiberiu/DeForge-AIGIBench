@@ -10,8 +10,7 @@ from sklearn import metrics
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
-# Import from detector_codes.detectors_utils
-from detector_codes.detectors_utils import (
+from detector_codes import (
     DEVICE,
     detector_classes,
     weight_mapping,
