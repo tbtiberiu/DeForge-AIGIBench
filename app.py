@@ -1,4 +1,5 @@
 import gradio as gr
+
 from detector_codes import DEVICE, detector_classes, weight_mapping
 
 # Model cache to avoid reloading
@@ -61,8 +62,8 @@ with gr.Blocks(title='AIGI Detector Bench') as demo:
 
     gr.Markdown("""
     ### About
-    This tool is a **modified version** of the official [AIGIBench](https://github.com/HorizonTEL/AIGIBench) repository, featuring state-of-the-art AI-Generated Image (AIGI) detectors. 
-    
+    This tool is a **modified version** of the official [AIGIBench](https://github.com/HorizonTEL/AIGIBench) repository, featuring state-of-the-art AI-Generated Image (AIGI) detectors.
+
     In this version, I have integrated the original baselines along with my own proposed solutions: **DeForge-AI** and **C2P-DINOv2**.
 
     - **Project Page**: [NeurIPS 2025] Is Artificial Intelligence Generated Image Detection a Solved Problem?
