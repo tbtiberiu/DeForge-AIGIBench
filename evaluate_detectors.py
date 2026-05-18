@@ -1,5 +1,7 @@
 import argparse
 import os
+import argparse
+import os
 import random
 
 import numpy as np
@@ -10,6 +12,8 @@ from sklearn import metrics
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
+load_dotenv()
+
 from detector_codes import (
     DEVICE,
     detector_classes,
@@ -17,8 +21,6 @@ from detector_codes import (
 )
 
 CACHE_DIR = None
-
-load_dotenv()
 HF_TOKEN = os.getenv('HF_TOKEN')
 
 SEED = 123

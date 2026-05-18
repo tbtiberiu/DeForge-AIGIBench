@@ -6,9 +6,12 @@ import urllib.request
 
 import torch
 import torch.nn as nn
+from dotenv import load_dotenv
 from huggingface_hub import snapshot_download
 from torchvision import transforms
 from transformers import CLIPModel
+
+load_dotenv()
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

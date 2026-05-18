@@ -1,4 +1,7 @@
 import gradio as gr
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from detector_codes import DEVICE, detector_classes, weight_mapping
 
