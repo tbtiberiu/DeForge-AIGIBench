@@ -32,11 +32,11 @@ def download_weights():
 
 
 # Download weights on import
-download_weights()
 
 
 class DetectorWrapper:
     def __init__(self):
+        download_weights()
         self.model = None
         self.transform = None
         self.use_optimal_threshold = False

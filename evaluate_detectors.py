@@ -1,7 +1,5 @@
 import argparse
 import os
-import argparse
-import os
 import random
 
 import numpy as np
@@ -142,9 +140,6 @@ def print_evaluation_results(similarities, datasets, use_optimal_threshold=False
     print(
         f'{id_name:<25} | {id_sim:<10.4f} | {avg_id_acc:<10.4f} | {"-":<10} | {"-":<10} | {"-":<10}'
     )
-    print(
-        f'{"Average Real":<25} | {id_sim:<10.4f} | {avg_id_acc:<10.4f} | {"-":<10} | {"-":<10} | {"-":<10}'
-    )
     print('-' * 95)
 
     # Generated Section
@@ -209,25 +204,7 @@ def main():
         '--model',
         type=str,
         required=True,
-        choices=[
-            'AIDE',
-            'C2P-CLIP',
-            'C2P-CLIP-Original',
-            'C2P-DINOv2',
-            'CLIPDetection',
-            'CNNDetection',
-            'DeForge-AI',
-            'DFFreq',
-            'Effort',
-            'FreqNet',
-            'GramNet',
-            'LaDeDa',
-            'LGrad',
-            'NPR',
-            'RIGID',
-            'Resnet50',
-            'SAFE',
-        ],
+        choices=sorted(list(detector_classes.keys())),
     )
     parser.add_argument(
         '--dataset',
@@ -241,6 +218,9 @@ def main():
     )
     parser.add_argument(
         '--batch_size', type=int, default=16, help='Batch size for evaluation'
+    )
+    parser.add_argument(
+        '--num_workers', type=int, default=4, help='Number of workers for DataLoader'
     )
     parser.add_argument(
         '--show_legend',
@@ -299,15 +279,22 @@ def main():
 
     # Prepare subsets
     real_indices = np.nonzero(all_generators == 0)[0]
-    real_dataset = HFImageDataset(
-        test_data.select(real_indices), transform=detector.transform
-    )
-    evaluation_datasets = [('Real (ID)', real_dataset)]
+    if len(real_indices) > 0:
+        real_indices_limited = real_indices[:args.limit]
+        real_dataset = HFImageDataset(
+            test_data.select(real_indices_limited), transform=detector.transform
+        )
+        evaluation_datasets = [('Real (ID)', real_dataset)]
+    else:
+        evaluation_datasets = []
 
     for gen_id, gen_name in generator_mapping.items():
         fake_indices = np.nonzero(all_generators == gen_id)[0]
+        if len(fake_indices) == 0:
+            continue
+        fake_indices_limited = fake_indices[:args.limit]
         fake_dataset = HFImageDataset(
-            test_data.select(fake_indices), transform=detector.transform
+            test_data.select(fake_indices_limited), transform=detector.transform
         )
         evaluation_datasets.append((f'{gen_name} (OOD)', fake_dataset))
 
@@ -320,32 +307,33 @@ def main():
             dataset_obj,
             batch_size=args.batch_size,
             shuffle=False,
-            num_workers=8,
+            num_workers=args.num_workers,
             pin_memory=True,
-            persistent_workers=True,
+            persistent_workers=True if args.num_workers > 0 else False,
         )
         scores = []
-        total = 0
 
-        # Calculate expected number of batches based on samples limit
-        total_batches = (
-            min(len(dataset_obj), args.limit) + args.batch_size - 1
-        ) // args.batch_size
         pbar = tqdm(
-            loader, total=total_batches, desc=f'Evaluating {dataset_name}', leave=False
+            loader, desc=f'Evaluating {dataset_name}', leave=False
         )
 
-        for i, (imgs, _) in enumerate(pbar):
+        for imgs, _ in pbar:
             imgs = imgs.to(DEVICE)
             # Detector returns p(fake), so we take 1 - p(fake) to get p(real)
-            p_fake = detector.detect(imgs)
+            with torch.no_grad():
+                p_fake = detector.detect(imgs)
+                if torch.is_tensor(p_fake):
+                    p_fake = p_fake.detach().cpu()
+                else:
+                    p_fake = torch.tensor(p_fake, dtype=torch.float32)
             score = 1.0 - p_fake
-            scores.append(score.cpu())
-            total += len(imgs)
-            if total >= args.limit:
-                break
+            scores.append(score)
 
-        scores = torch.cat(scores)[: args.limit]
+        if len(scores) > 0:
+            scores = torch.cat(scores)
+        else:
+            scores = torch.tensor([], dtype=torch.float32)
+
         print(
             f'{dataset_name:<25}, Count: {len(scores)}, Similarity: {scores.mean():.4f}'
         )
