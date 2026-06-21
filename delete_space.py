@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 from huggingface_hub import HfApi
 
@@ -29,7 +30,7 @@ except Exception as e:
 
 print(f"\n2. Attempting to recreate space '{repo_id}'...")
 try:
-    api.create_repo(repo_id=repo_id, repo_type='space', space_sdk='gradio', token=token)
+    # api.create_repo(repo_id=repo_id, repo_type='space', space_sdk='gradio', token=token)
     print('Success: Space created successfully!')
     print('\nYou can now trigger your GitHub Actions workflow to push the code.')
 except Exception as e:
