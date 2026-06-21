@@ -9,6 +9,7 @@ dependencies = [
     "clip",
     "datasets>=4.8.4",
     "einops>=0.8.2",
+    "gradio>=6.19.0",
     "kornia>=0.8.2",
     "loralib>=0.1.2",
     "numpy>=2.4.4",
